@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/scrape.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/checker.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    { "src": "/api/scrape", "dest": "/api/scrape.js" },
+    { "src": "/api/check", "dest": "/api/check.js" }
+  ]
+}
