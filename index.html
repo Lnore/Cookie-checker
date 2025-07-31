@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cookie Checker</title>
+  <style>
+    body {
+      background: #1e1e1e;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    .progress-bar {
+      width: 100%;
+      background: #444;
+      height: 30px;
+      border-radius: 20px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+    .bar {
+      height: 100%;
+      width: 0;
+      background: #4caf50;
+      transition: width 0.3s;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+    .result-box {
+      margin-top: 40px;
+      padding: 20px;
+      background: white;
+      color: black;
+      border-radius: 15px;
+      display: none;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0 }
+      to { opacity: 1 }
+    }
+    .big-check {
+      font-size: 60px;
+      color: #4caf50;
+      animation: pop 0.4s ease-in-out;
+    }
+    @keyframes pop {
+      0% { transform: scale(0.5); opacity: 0 }
+      100% { transform: scale(1); opacity: 1 }
+    }
+    .btn {
+      background: #333;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      margin: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Roblox Cookie Checker</h1>
+  <button class="btn" onclick="startProses()">🔍 Mulai Proses</button>
+
+  <div class="progress-bar" id="progressBar" style="display:none;">
+    <div class="bar" id="bar"></div>
+  </div>
+
+  <div class="status" id="status"></div>
+
+  <div class="result-box" id="resultBox">
+    <div class="big-check">✅</div>
+    <h2>Proses Berhasil</h2>
+    <p>Silahkan klik download jika kamu ingin download file ini.</p>
+    <p>Klik kembali jika ingin kembali ke menu awal.</p>
+    <p>Klik lanjut jika ingin lanjut ke proses checker.</p>
+    <button class="btn" onclick="reset()">🔙 Kembali</button>
+    <a class="btn" href="/hasilsemua.txt" download>⬇️ Download</a>
+    <button class="btn" onclick="lanjut()">➡️ Lanjut</button>
+  </div>
+
+  <script>
+    function startProses() {
+      document.getElementById('progressBar').style.display = 'block';
+      const bar = document.getElementById('bar');
+      const status = document.getElementById('status');
+      const evtSource = new EventSource("/api/scrape");
+
+      evtSource.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        if (data.done) {
+          evtSource.close();
+          bar.style.width = "100%";
+          status.innerText = `✅ Selesai: ${data.total} cookie dicek`;
+          document.getElementById('resultBox').style.display = "block";
+        } else {
+          bar.style.width = data.percent + "%";
+          status.innerText = `⌛ ${data.percent}% | Waktu: ${data.elapsed}s | Cookie Dicek: ${data.total}`;
+        }
+      };
+    }
+
+    function reset() {
+      location.reload();
+    }
+
+    function lanjut() {
+      fetch("/api/check").then(res => res.text()).then(data => {
+        alert("Proses lanjut checker selesai. Cek terminal atau file output.");
+      });
+    }
+  </script>
+</body>
+</html>
